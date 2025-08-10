@@ -89,8 +89,6 @@ flowchart LR
 	U[Clinic User Browser]
  end
  U --> LB[(Per-tenant DNS / Direct Access)] --> VM1[(Tenant VM<br/>Tomcat + App + MySQL)]
- note right of VM1: Tight coupling<br/>Compute+DB per tenant
-```
 
 ASCII (alt):
 Clinic User -> [Tenant VM: Tomcat + App + MySQL] (repeat N times). No shared services; each VM unique.
