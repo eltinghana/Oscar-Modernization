@@ -1,7 +1,7 @@
 # Platform Modernization & Multi-Tenancy Roadmap
 
 Version: 2025-08-10  
-Owner: (Add name)  
+Owner: Elvis Addae
 Status: Draft (Initial)
 
 # Executive Summary (Non-Technical Overview)
@@ -32,8 +32,6 @@ Risk Mitigation Approach:
 
 KPIs Tracked Monthly for Exec Dashboard:
 - Cost / Tenant, Deployment Frequency, Lead Time, Availability %, Security Vulnerabilities (open >30 days), p95 Latency, Tenant Onboarding Time.
-
-Call to Action (Next 30 Days): Approve resource allocation for containerization & security tooling; align on KPIs & governance cadence.
 
 ---
 
@@ -194,7 +192,7 @@ flowchart LR
  MQ2 --> AUDIT[Audit Log Pipeline]
 ```
 
-> Diagrams are conceptual; exact naming, versions, and component boundaries will be refined in ADRs. Colors in Mermaid indicate observability (green) and security (red) concerns.
+
 
 
 ## 4. Phased Roadmap (Quarters are illustrative)
