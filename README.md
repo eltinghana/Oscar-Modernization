@@ -90,14 +90,14 @@ flowchart LR
   end
     U --> LB[("Per-tenant DNS / Direct Access")]
     LB --> VM1[("Tenant VM<br>Tomcat + App + MySQL")]
-
+```
 
 #### 3a.2 Target State (Shared Multi-Tenant Platform)
 ```mermaid
 flowchart LR
  U[Clinic User / API Client] --> CDN[(CDN/Edge)] --> WAF[WAF / Ingress Controller]
  WAF --> GW[API Gateway / Routing]
- GW -->|OIDC| AUTH[Identity & Access (Keycloak)]
+ GW -->|OIDC| AUTH[Identity & Access]
  GW --> BFF[BFF / GraphQL-Orchestrator]
  BFF --> SCHED[Scheduling Service]
  BFF --> PAT[Patient Records Service]
@@ -123,9 +123,6 @@ flowchart LR
  classDef obs fill:#f5ffe6,stroke:#7f993f
  classDef sec fill:#ffe6e6,stroke:#cc0000
 ```
-
-ASCII (alt):
-User -> Edge/WAF -> API Gateway -> (Auth) -> BFF -> Domain Services -> Shared DB (schemas), Redis, Object Storage, Event Bus; all emitting metrics/logs.
 
 #### 3a.3 Phased Implementation Layers
 ```mermaid
@@ -177,8 +174,8 @@ flowchart TD
 	Sales[Signed Contract] --> Provision[Automated Provisioner]
 	Provision --> CreateSchema[Create DB Schema + Apply Migrations]
 	CreateSchema --> Secrets[Generate Secrets & Store in Vault]
-	Secrets --> Config[Create Tenant Config (YAML/CRD)]
-	Config --> Deploy[Register Tenant (API Gateway + Auth Realm/Group)]
+	Secrets --> Config[Create Tenant Config YAML/CRD]
+	Config --> Deploy[Register Tenant API Gateway + Auth Realm/Group]
 	Deploy --> Smoke[Automated Smoke & Isolation Tests]
 	Smoke --> Activate[Mark Tenant Active]
 	Activate --> Notify[Send Onboarding Notification]
@@ -189,10 +186,10 @@ flowchart TD
 ```mermaid
 flowchart LR
  LAB[External Lab System] --> HL7[HL7/FHIR Adapter]
- HL7 --> MQ[(Kafka Topic: lab.inbound)] --> LABS[Labs Service]
- LABS --> DB[(MySQL Cluster)]
+ HL7 --> MQ[Kafka Topic: lab.inbound] --> LABS[Labs Service]
+ LABS --> DB[MySQL Cluster]
  LABS --> PAT[Patient Service]
- PAT --> MQ2[(Event: patient.updated)] --> NOTIFY[Notification Service]
+ PAT --> MQ2[Event: patient.updated] --> NOTIFY[Notification Service]
  NOTIFY --> OUT[Email/SMS]
  MQ2 --> AUDIT[Audit Log Pipeline]
 ```
