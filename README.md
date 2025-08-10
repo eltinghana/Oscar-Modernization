@@ -192,7 +192,37 @@ flowchart LR
  MQ2 --> AUDIT[Audit Log Pipeline]
 ```
 
+### 3b. Can We Deploy the Code “As-Is”? What Must Change and Why
+**Short Answer:**  
+- **True pooled multi-tenant deployment (Kubernetes + shared DB cluster): _No, not without changes_.** The current application assumes per-tenant server isolation and local state, which blocks horizontal scaling and safe tenancy isolation.  
+- **Interim container-per-tenant lift-and-shift: _Mostly yes_, with targeted changes** (externalized config, health checks, Redis sessions). This enables early wins while refactoring for proper multi-tenancy.
 
+#### Minimum-Change Lift-and-Shift (Phase 1–2)
+- Containerize the WAR (multi-stage Docker build).  
+- Externalize configuration to environment variables / ConfigMaps; move secrets to Vault.  
+- Add `/health` and `/ready` endpoints for orchestrator readiness.  
+- Redis-backed sessions to eliminate sticky session requirements.  
+- Temporary persistent volume for unavoidable local writes, with planned migration to object storage.  
+- Deploy in isolated namespaces or workloads per tenant initially, then consolidate after tenancy readiness.
+
+#### Why “As-Is” Won’t Work for the Pooled End State
+| Area | Current Likely Behavior | Why It Blocks Modern Ops | Required Change |
+|------|------------------------|--------------------------|-----------------|
+| Session Management | Tomcat in-memory sessions | Breaks stateless scaling & resilience | Redis sessions (P1), token-based auth (P3) |
+| File Storage | Local disk for uploads/reports | Containers are ephemeral; no HA | Object storage (S3/Blob) (P2) |
+| Config & Secrets | Properties files per VM | No automation; insecure | Env/config maps; Vault secrets (P1) |
+| Health & Readiness | No endpoints | Cannot autoscale safely | `/health` & `/ready` checks (P1) |
+| Background Jobs | Quartz/Cron in web app | Jobs restart/fail on pod reschedules | Dedicated workers or clustered jobs (P3) |
+| Tenancy Resolution | DB-per-VM assumption | No tenant isolation in pooled app | Tenant context + datasource routing (P2) |
+| AuthN/AuthZ | Legacy login/session | Weak central control; no MFA/SSO | OIDC integration; centralized policy (P3) |
+| Libraries & Runtime | Outdated frameworks | Security & compatibility risk | CVE-free upgrades; Java 17 path (P3) |
+| Logging & Tracing | Unstructured logs | No tenant-level observability | JSON logs; trace/tenant IDs; OpenTelemetry (P1) |
+| Reporting | Heavy sync exports | Latency spikes & timeouts | Async processing via queue (P4) |
+
+#### Early Proof Points
+- **Phase 1:** Container image, config externalization, Redis sessions, health endpoints (pilot 5–10 tenants).  
+- **Phase 2:** Per-schema tenancy, automated DB migrations, object storage for documents.  
+- **Phase 3:** OIDC integration, façade module for new endpoints, move long-running jobs out of web tier.
 
 
 ## 4. Phased Roadmap (Quarters are illustrative)
