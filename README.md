@@ -85,13 +85,12 @@ Executive Narrative (Plain Language): We are turning a collection of individuall
 #### 3a.1 Current State (One VM per Tenant)
 ```mermaid
 flowchart LR
- subgraph Internet
-	U[Clinic User Browser]
- end
- U --> LB[(Per-tenant DNS / Direct Access)] --> VM1[(Tenant VM<br/>Tomcat + App + MySQL)]
+ subgraph Internet["Internet"]
+        U["Clinic User Browser"]
+  end
+    U --> LB[("Per-tenant DNS / Direct Access")]
+    LB --> VM1[("Tenant VM<br>Tomcat + App + MySQL")]
 
-ASCII (alt):
-Clinic User -> [Tenant VM: Tomcat + App + MySQL] (repeat N times). No shared services; each VM unique.
 
 #### 3a.2 Target State (Shared Multi-Tenant Platform)
 ```mermaid
